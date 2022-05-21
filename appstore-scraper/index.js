@@ -6,7 +6,7 @@ const { response } = require("express");
 const express = require("express");
 
 const fs = require('fs');
-const writeStream = fs.createWriteStream('post.csv');
+const writeStream = fs.createWriteStream('appStore.csv');
 
 /** To use Express, once required, we must call it */
 const app = express();
@@ -55,12 +55,6 @@ for (let i = 0; i < urls.length; i++) {
         let privacyData = [];   // for User Data Collected Table
         let privacyDataBooleans = [];    // for User Data Collected Table
 
-
-        /** Array for saving each item we will get from the html */
-//       const items = [];
-//       let name = "NULL";
-//       let value = "NULL";
-
         /** Code to get app's name from its url */
         name = urls[i].substring(30);
         name = name.substring(0, name.indexOf("/"));
@@ -77,7 +71,8 @@ for (let i = 0; i < urls.length; i++) {
         operatingSystem = operatingSystem.slice(0, -1); // deletes dot at end of string
 
         /** Code to get size and category */
-        /** We are going to iterate throw the elements of the specified class */
+        /** we are going to pick up from the html whatever class is specificied after the dot sign,
+         * and iterating throw the elements of that class */
         $("dd.information-list__item__definition", html).each((i, el) => {
             if (i == 1) {
                 size = $(el).text();
@@ -87,7 +82,7 @@ for (let i = 0; i < urls.length; i++) {
         });
         category = category.replace(/(\n)/gm, "").trim();
 
-        /** Code to get the age_restriction */
+        /** Code to get the age restriction */
         ageRestriction = $(".badge.badge--product-title").html();
 
         apps.push({
@@ -117,7 +112,7 @@ for (let i = 0; i < urls.length; i++) {
         url = url.slice(index1+6, index2);
 
         /** Code to get app's last version and the day it was launched */
-        $(".l-row",html).each((i, el) =>{
+        $(".l-row", html).each((i, el) => {
             if (i == 4) versionDate = $(el).text().trim();
         });
         console.log(versionDate);
@@ -157,17 +152,15 @@ for (let i = 0; i < urls.length; i++) {
             privacyType = $(el).find("h3.privacy-type__heading").text();
 
             /** Code to get all the data collected from each type */
+            privacyData = [];
             $(el).find(".privacy-type__grid-content.privacy-type__data-category-heading").each((i, el2) => {
                 privacyData.push($(el2).text());
             });
 
             /** Conversion of collected data to true or false */
+            privacyDataBooleans = [];
             for (let j = 0; j < keys.length; j++) {
                 privacyData.includes(keys[j]) ? (privacyDataBooleans[j] = true) : (privacyDataBooleans[j] = false);
-                /* dataToBooleans[j] = false;
-                if(data.includes(keys[j])) {
-                    dataToBooleans[j] = true; 
-                } */
             }
 
             collectedData.push({
@@ -186,26 +179,6 @@ for (let i = 0; i < urls.length; i++) {
         });
 
         console.log("\n\n");
-
-
-        /** Now we are going to pick up from the html whatever class is specificied after the dot sign.
-         * For each item, we want to get that item and grab its text */
-//        $(".privacy-type__data-category-heading", html).each(function () {
-
-//            const data = $(this).text();
-
-//            /** Creation of the object composed by data, and insertion in the array */
-//            items.push({
-//                appName,
-//                data,
-//            });
-            
-//            name = appName;
-//            value = data;
-            /** Write Row To CSV */
-//            writeStream.write(`${name},${value}\n`);
-//        });
-//        console.log(items);
     })
     .catch((err) => console.log(err)); /** To catch errors and print them out */
 
