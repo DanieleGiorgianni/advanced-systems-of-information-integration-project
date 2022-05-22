@@ -6,7 +6,6 @@ const { response } = require("express");
 const express = require("express");
 
 /** Array with keywords to find in the HTML page */
-//const keys = [" contact", " correo", " ubicación", " pago", " búsqueda", " error", " foto", " teléfono", " uso", " idioma", " dirección IP"];
 const keys = [" contact", " email", " location", " pay", " search", " error", " photo", " address book", " use", " language", " IP address"];
 
 const fs = require('fs');
@@ -88,9 +87,19 @@ for (let i = 0; i < urls.length; i++) {
         let collectedData = []; // for User Data Collected Table
         let privacyData = [];   // for User Data Collected Table
 
-        /** Code to get app's name. */
-        /* We are going to pick up from the html whatever class is specificied after the dot sign */
+        /** Code to get app's name.
+         * We are going to pick up from the html whatever class is specificied after the dot sign */
         name = $(".AHFaub").text();
+
+        /** Code to get app's category */
+        category = $("a.hrTbp.R8zArc").parent().next().text();
+
+        /** Url obtained from the privacyUrls array to avoid errors */
+        url = privacyUrls[i];
+
+        /** By selecting the following class in the html page, 
+         * it is possible to tell whether the app contains advertising elements or not */
+        ($(".bSIuKf").text() != "") ? (advertising = true) : (advertising = false);
 
         /** Code to get the app date, version, operating system and age restriction.
          * All of them have the same html class, so we iterate through the class and get them by index */
@@ -103,9 +112,6 @@ for (let i = 0; i < urls.length; i++) {
 
 
         /** ------ APPS TABLE ------ */
-
-        /** Code to get app's category */
-        category = $("a.hrTbp.R8zArc").parent().next().text();
 
         apps.push({
             name,
@@ -121,23 +127,10 @@ for (let i = 0; i < urls.length; i++) {
         writeStream.write(`${name},${operatingSystem},${category},${ageRestriction}\n`);
         writeStream.write(`\n`);
 
-        console.log("\n\n");
+        console.log("");
 
 
         /** ------ PRIVACY TABLE ------ */
-
-        /** Code to get url of the privacy policy */
-        /* url = $(".hrTbp.euBY6b").parent().next().html();
-        const index1 = url.indexOf("href=\"");
-        const index2 = url.indexOf("\" ");
-        url = url.slice(index1+6, index2); */
-
-        /** Url obtained from the privacyUrls array to avoid errors */
-        url = privacyUrls[i];
-
-        /** By selecting the following class in the html page, 
-         * it is possible to tell whether the app contains advertising elements or not */
-        ($(".bSIuKf").text() != "") ? (advertising = true) : (advertising = false);
 
         privacy.push({
             name,
@@ -155,7 +148,7 @@ for (let i = 0; i < urls.length; i++) {
         writeStream.write(`${name},${version},${date},${infoTerceros},${advertising},${url}\n`);
         writeStream.write(`\n`);
 
-        console.log("\n\n");
+        console.log("");
 
 
         /** ------ USER DATA COLLECTED TABLE ------ */
@@ -193,20 +186,17 @@ for (let i = 0; i < urls.length; i++) {
             console.log("User Data Collected");
             console.log(collectedData);
 
-            //console.log(privacyUrls[i]);
-            //console.log(privacyData);
-
             /** Write Row To CSV */
             writeStream.write(`Nombre App,Version App,Contacto,Credenciales,Demografia,Pagos,Historial de Busquedas,Informes de Errores,Multimedia,Agenda,Informacion De Uso,Idioma,Informacion Sobre el Dispositivo\n`);
             writeStream.write(`${name},${version},${privacyData}\n`);
             writeStream.write(`\n`);
 
-            /** Write Row To CSV */
-            //writeStream.write(`${privacyData}\n`);
+            console.log("");
+
         })
         .catch((err) => console.log("ERROR" + err)); /** To catch errors and print them out */
 
-        console.log("\n\n");
+        console.log("\n");
     })
     .catch((err) => console.log("ERROR" + err)); /** To catch errors and print them out */
 

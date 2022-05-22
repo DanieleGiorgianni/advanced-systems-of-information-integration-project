@@ -43,7 +43,6 @@ for (let i = 0; i < urls.length; i++) {
         let operatingSystem;
         let ageRestriction;
         let url;
-        let versionDate;
         let version;
         let date;
         let privacyType;
@@ -64,14 +63,14 @@ for (let i = 0; i < urls.length; i++) {
 
         /** ------ APPS TABLE ------ */
 
-        /** Code to get operating system version. */
-        /** We are going to pick up from the html whatever class is specificied after the dot sign */
+        /** Code to get operating system version.
+         * We are going to pick up from the html whatever class is specificied after the dot sign */
         operatingSystem = $(".information-list__item__definition__item__definition").first().text();
         operatingSystem = operatingSystem.replace(/(\n)/gm, "").trim();
         operatingSystem = operatingSystem.slice(0, -1); // deletes dot at end of string
 
-        /** Code to get size and category */
-        /** we are going to pick up from the html whatever class is specificied after the dot sign,
+        /** Code to get size and category.
+         * We are going to pick up from the html whatever class is specificied after the dot sign,
          * and iterating throw the elements of that class */
         $("dd.information-list__item__definition", html).each((i, el) => {
             if (i == 1) {
@@ -100,7 +99,7 @@ for (let i = 0; i < urls.length; i++) {
         writeStream.write(`${name},${operatingSystem},${category},${size},${ageRestriction}\n`);
         writeStream.write(`\n`);
 
-        console.log("\n\n");
+        console.log("");
 
 
         /** ------ PRIVACY TABLE ------ */
@@ -112,12 +111,9 @@ for (let i = 0; i < urls.length; i++) {
         url = url.slice(index1+6, index2);
 
         /** Code to get app's last version and the day it was launched */
-        $(".l-row", html).each((i, el) => {
-            if (i == 4) versionDate = $(el).text().trim();
-        });
-        console.log(versionDate);
-        version = versionDate.slice(versionDate.indexOf("Versión"));
-        date = versionDate.slice(0, 11);
+        version = $(".l-column.small-6.medium-12.whats-new__latest__version").text();
+        date = $(".l-column.small-6.medium-12.whats-new__latest__version").parent().text();
+        date = date.slice(13,24);
 
         privacy.push({
             name,
@@ -133,7 +129,7 @@ for (let i = 0; i < urls.length; i++) {
         writeStream.write(`${name},${version},${date},${url}\n`);
         writeStream.write(`\n`);
 
-        console.log("\n\n");
+        console.log("");
      
 
         /** ------ USER DATA COLLECTED TABLE ------ */
@@ -169,16 +165,16 @@ for (let i = 0; i < urls.length; i++) {
                 privacyType,
                 privacyDataBooleans
             });
-            console.log("User Data Collected");
-            console.log(collectedData);
-
+            
             /** Write Row To CSV */
             writeStream.write(`Nombre App,Version App,Tipo,Datos Contacto,Salud Fitness,Info FInanciera,Ubicacion,Info SEnsitiva,Contactos,Contenido Usuario,Historial Busqueda,Historial Navegacion,Identificadores,CoMpras,Datos Uso,Diagnostico\n`);
             writeStream.write(`${name},${version},${privacyType},${privacyDataBooleans}\n`);
             writeStream.write(`\n`);
         });
+        console.log("User Data Collected");
+        console.log(collectedData);
 
-        console.log("\n\n");
+        console.log("\n");
     })
     .catch((err) => console.log(err)); /** To catch errors and print them out */
 
